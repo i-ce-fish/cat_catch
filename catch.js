@@ -5,10 +5,14 @@
  */
 import { parseArgs } from 'node:util';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { sniff, UnsupportedError } from './lib/sniffer.js';
 import { pickResources, interactivePick, printTable, dashPair } from './lib/picker.js';
 import { downloadResources } from './lib/download/index.js';
 import { ensureCookie, ensureReferer } from './lib/headers.js';
+
+/** 项目根目录（catch.js 所在处）：profile 锚定到这里，不随运行目录漂移 */
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 
 const HELP = `
 cat_catch —— 输入网址自动嗅探下载网页视频（B站 m4s 音画自动合并）
@@ -78,6 +82,10 @@ async function main() {
   const debug = (msg) => verbose && log(msg);
 
   const outDir = path.resolve(values.out);
+  // profile 相对路径锚定项目根：在任何目录运行都复用同一份登录态
+  const profileDir = path.isAbsolute(values.profile)
+    ? values.profile
+    : path.resolve(PROJECT_ROOT, values.profile);
   let resources = [];
   let cookies = [];
   let userAgent;
@@ -94,7 +102,7 @@ async function main() {
     let sniffResult;
     try {
       sniffResult = await sniff(url, {
-        profileDir: path.resolve(values.profile),
+        profileDir,
         headed: values.headed,
         timeout: parseInt(values.timeout, 10),
         quietMs: parseInt(values.quiet, 10),
@@ -115,6 +123,15 @@ async function main() {
     userAgent = sniffResult.userAgent;
     pageTitle = sniffResult.pageTitle;
     keys = sniffResult.keys;
+    // B 站登录态检测：让用户立刻知道登录是否生效（SESSDATA 是 B 站登录核心 cookie）
+    if (/bilibili\.com/.test(url)) {
+      const loggedIn = cookies.some((c) => c.name === 'SESSDATA' && c.value);
+      log(
+        loggedIn
+          ? '✓ 检测到 B 站登录态（SESSDATA），将获取登录后清晰度'
+          : '⚠ 未检测到 B 站登录态：只能拿到 360P/480P。需要高清请用 --headed 在弹出的窗口里登录（日常 Chrome 的登录不算数）'
+      );
+    }
     // B 站 playurl 结构化数据优先：构造音画资源对置于列表最前（best 策略直接命中）
     if (sniffResult.dashInfo) {
       const pair = dashPair(sniffResult.dashInfo, pageTitle);

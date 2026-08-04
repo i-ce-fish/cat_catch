@@ -62,6 +62,22 @@ node catch.js "https://www.bilibili.com/video/BV另一个视频"
 
 > 想换账号或登录态失效（B 站 cookie 约一个月过期）：重跑一次 `--headed` 流程即可。
 
+## 配置文件
+
+项目根目录 `cat_catch.config.json`：
+
+```json
+{
+  "singleM4sFormat": "mp3"
+}
+```
+
+| 配置项 | 默认 | 说明 |
+|---|---|---|
+| `singleM4sFormat` | `mp3` | **单个 m4s**（未参与音画配对的视频轨/音频轨）落盘时的输出格式。`mp3`/`wav` 会重编码只留声音（视频轨 → 提取音频）；`mp4`/`m4a`/`mkv` 等流拷贝；`m4s` 保留原样不转换 |
+
+**只要音频**：`node catch.js "<url>" --pick audio` → 自动选最高码率音频轨，按配置转出 mp3。
+
 ## 全部参数
 
 | 参数 | 默认 | 说明 |
@@ -70,8 +86,9 @@ node catch.js "https://www.bilibili.com/video/BV另一个视频"
 | `-t, --timeout <ms>` | `45000` | 嗅探硬超时 |
 | `--quiet <ms>` | `4000` | 静默判定窗口（无新资源多久后收工） |
 | `-j, --concurrency <n>` | `6` | 分片/文件并发数 |
-| `--pick <mode>` | `best` | `best` 智能选择 / `all` 全部 / `1,3` 序号 / `list` 列出后交互 |
+| `--pick <mode>` | `best` | `best` 智能选择 / `all` 全部 / `audio` 仅音频轨 / `1,3` 序号 / `list` 列出后交互 |
 | `--format <fmt>` | `mp4` | HLS 输出封装（`ts` 则不转封装） |
+| `--single-format <fmt>` | 读配置 | 单个 m4s 输出格式（覆盖配置项 singleM4sFormat） |
 | `--name <tpl>` | `{title}.{ext}` | 文件名模板，支持 `{title}` `{ext}` `{n}` |
 | `--headed` | 关 | 显示浏览器窗口（登录/调试） |
 | `--no-autoplay` | 开 | 不模拟播放（某些站点会因此嗅探不到） |

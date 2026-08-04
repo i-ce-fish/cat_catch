@@ -10,6 +10,7 @@ import { sniff, UnsupportedError } from './lib/sniffer.js';
 import { pickResources, interactivePick, printTable, dashPair } from './lib/picker.js';
 import { downloadResources } from './lib/download/index.js';
 import { ensureCookie, ensureReferer } from './lib/headers.js';
+import { loadConfig } from './lib/config.js';
 
 /** 项目根目录（catch.js 所在处）：profile 锚定到这里，不随运行目录漂移 */
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
@@ -25,8 +26,9 @@ cat_catch —— 输入网址自动嗅探下载网页视频（B站 m4s 音画自
   -t, --timeout <ms>     嗅探硬超时（默认 45000）
       --quiet <ms>       静默判定窗口（默认 4000）
   -j, --concurrency <n>  分片/文件并发（默认 6）
-      --pick <mode>      best（默认）| all | 序号如 1,3 | list（仅列出）
+      --pick <mode>      best（默认）| all | audio（仅音频轨）| 序号如 1,3 | list（仅列出）
       --format <fmt>     HLS 输出 mp4（默认）| ts
+      --single-format <fmt>  单个 m4s 输出格式（覆盖配置项，可选 mp3/wav/mp4/m4a/m4s 等）
       --name <tpl>       文件名模板（默认 "{title}.{ext}"）
       --headed           显示浏览器窗口（首次登录 B 站用）
       --no-autoplay      不模拟播放
@@ -40,8 +42,12 @@ cat_catch —— 输入网址自动嗅探下载网页视频（B站 m4s 音画自
 示例:
   node catch.js "https://www.bilibili.com/video/BV1xx411c7mD"
   node catch.js "https://example.com/page" --pick list
+  node catch.js "<url>" --pick audio           # 只下音频轨 → 默认转出 mp3
   node catch.js "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
   node catch.js "<url>" --headed        # 首次登录 B 站（登录态存入 profile 复用）
+
+配置文件（项目根 cat_catch.config.json）:
+  { "singleM4sFormat": "mp3" }   单个 m4s 落盘时的输出格式（mp3/wav/mp4/m4a；'m4s' 保留原样）
 `;
 
 const MEDIA_URL_RE = /\.(m3u8|m3u|mpd|mp4|m4s|flv|mp3|m4a|aac|webm|mkv|mov|wav|ogg)(\?|#|$)/i;
@@ -56,6 +62,7 @@ async function main() {
       concurrency: { type: 'string', short: 'j', default: '6' },
       pick: { type: 'string', default: 'best' },
       format: { type: 'string', default: 'mp4' },
+      'single-format': { type: 'string' },
       name: { type: 'string', default: '{title}.{ext}' },
       headed: { type: 'boolean', default: false },
       autoplay: { type: 'boolean', default: true },
@@ -80,6 +87,10 @@ async function main() {
   const verbose = values.verbose;
   const log = (msg) => process.stderr.write(`[cat_catch] ${msg}\n`);
   const debug = (msg) => verbose && log(msg);
+
+  // 配置文件（项目根 cat_catch.config.json），CLI --single-format 优先于配置项
+  const config = await loadConfig(PROJECT_ROOT);
+  const singleM4sFormat = (values['single-format'] ?? config.singleM4sFormat).toLowerCase();
 
   const outDir = path.resolve(values.out);
   // profile 相对路径锚定项目根：在任何目录运行都复用同一份登录态
@@ -185,6 +196,7 @@ async function main() {
   const { results, errors } = await downloadResources(selected, {
     outDir,
     format: values.format,
+    singleM4sFormat,
     concurrency: parseInt(values.concurrency, 10),
     nameTpl: values.name,
     keepParts: values['keep-parts'],

@@ -37,10 +37,23 @@ node catch.js "<url>" --pick list
 未登录只能拿到 360P/480P。登录一次，cookie 永久复用：
 
 ```bash
-node catch.js "<url>" --headed
+node catch.js "https://www.bilibili.com/video/BV你的视频" --headed
 ```
 
-会弹出真实浏览器窗口 → 在窗口里登录 B 站（需要的话顺便在播放器里切到想要的清晰度）→ 脚本自动完成嗅探下载并关窗。登录态保存在 `./.catch-profile/`，之后正常运行（headless）自动复用。
+操作流程：
+
+1. 终端会弹出真实浏览器窗口并打开该视频页
+2. **在窗口里完成登录**：点 B 站右上角「登录」→ 用 B 站 App 扫码（或账号密码）
+3. 登录成功后**回到终端按回车**——页面自动刷新，playurl 会用登录态重新请求高清地址
+4. 脚本自动继续：嗅探 → 下载 → 合并 mp4 → 关窗
+
+登录态保存在 `./.catch-profile/`。**之后下载同一账号权限内的视频，直接正常运行即可**（不用再加 `--headed`）：
+
+```bash
+node catch.js "https://www.bilibili.com/video/BV另一个视频"
+```
+
+> 想换账号或登录态失效（B 站 cookie 约一个月过期）：重跑一次 `--headed` 流程即可。
 
 ## 全部参数
 

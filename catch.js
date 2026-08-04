@@ -110,6 +110,7 @@ async function main() {
         autoplay: !values['no-autoplay'],
         deepHook: !values['no-hook'],
         log: debug,
+        infoLog: log,
       });
     } catch (err) {
       if (err instanceof UnsupportedError) {

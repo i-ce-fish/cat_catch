@@ -141,3 +141,10 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# cat_catch 项目
+.catch-profile/
+downloads/
+*.parts/
+.DS_Store
+.claude/

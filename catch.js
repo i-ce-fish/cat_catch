@@ -169,7 +169,8 @@ async function main() {
   let selected;
   if (values.pick === 'list') {
     selected = (await interactivePick(resources)) ?? [];
-  } else if (values.pick === 'best' && process.stdin.isTTY && resources.length > 2) {
+  } else if (values.pick === 'best' && !values.headed && process.stdin.isTTY && resources.length > 2) {
+    // headed 场景刚按过回车确认登录，不再二次交互，直接 best
     selected = (await interactivePick(resources)) ?? pickResources(resources, 'best');
   } else {
     selected = pickResources(resources, values.pick);

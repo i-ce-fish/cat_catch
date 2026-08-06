@@ -1,5 +1,10 @@
 appId: com.catcatch.app
 productName: cat_catch
+
+# 不自动发布到 GitHub Releases，避免 CI 因缺少 GH_TOKEN 而构建失败；
+# 仅在本地/CI 生成安装包，供手动上传或分发。
+publish: never
+
 directories:
   output: dist
   buildResources: build

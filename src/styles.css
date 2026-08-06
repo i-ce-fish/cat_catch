@@ -1,0 +1,299 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: #f5f6f8;
+  color: #1f2430;
+}
+
+.app-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: #888;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 16px 24px;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-header h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-widget {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-badge {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: #eee;
+  color: #666;
+}
+
+.login-badge.on {
+  background: #e3f7e8;
+  color: #1a8a3d;
+}
+
+.login-hint {
+  font-size: 12px;
+  color: #888;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid #e3e5ea;
+}
+
+.tab {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  border-bottom: 2px solid transparent;
+}
+
+.tab.active {
+  color: #2361f0;
+  border-bottom-color: #2361f0;
+  font-weight: 600;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #e3e5ea;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 13px;
+  color: #555;
+  font-weight: 500;
+}
+
+.field-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.field input[type='text'],
+.field select,
+.field textarea {
+  padding: 8px 10px;
+  border: 1px solid #d7dae0;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.field input[type='text'] {
+  flex: 1;
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.radio,
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #333;
+  cursor: pointer;
+}
+
+.inline-config {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  background: #f8f9fb;
+  border-radius: 8px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border: 1px solid #2361f0;
+  background: #2361f0;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  align-self: flex-start;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #2361f0;
+}
+
+.btn-small {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.hint {
+  font-size: 12px;
+  color: #888;
+  margin: 0;
+}
+
+.task-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 8px;
+}
+
+.task-section h2 {
+  font-size: 15px;
+  margin: 0;
+}
+
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #e3e5ea;
+  border-radius: 10px;
+  overflow: auto;
+  display: block;
+}
+
+.task-table thead,
+.task-table tbody {
+  display: block;
+}
+
+.task-table tr {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f0f1f4;
+}
+
+.task-table th,
+.task-table td {
+  padding: 8px 10px;
+  font-size: 12px;
+  text-align: left;
+}
+
+.task-url {
+  flex: 2;
+  color: #333;
+}
+
+.task-progress {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-actions {
+  flex: 1;
+  display: flex;
+  gap: 6px;
+}
+
+.progress-bar {
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #2361f0;
+  transition: width 0.2s ease;
+}
+
+.progress-text {
+  font-size: 11px;
+  color: #888;
+}
+
+.task-error {
+  font-size: 11px;
+  color: #d33;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  background: #eee;
+  color: #666;
+}
+
+.badge-success {
+  background: #e3f7e8;
+  color: #1a8a3d;
+}
+
+.badge-failed {
+  background: #fbe3e3;
+  color: #c0392b;
+}
+
+.badge-downloading,
+.badge-sniffing,
+.badge-retrying {
+  background: #e7effe;
+  color: #2361f0;
+}

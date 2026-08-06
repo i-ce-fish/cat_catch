@@ -1,4 +1,20 @@
 allowBuilds:
-  ffmpeg-static: set this to true or false
+  electron: true
+  electron-winstaller: true
+  esbuild: true
+  ffmpeg-static: true
+
 onlyBuiltDependencies:
   - ffmpeg-static
+  - electron
+  - electron-winstaller
+  - esbuild
+
+# electron-builder@26.15.3 的 electronGet.js 用到了 @electron/get@5 才有的 ElectronDownloadCacheMode，
+# 但其 package.json 依赖范围仍是 ^3.0.0（上游遗漏未同步升级），导致下载 Electron 二进制阶段报错
+# "Cannot read properties of undefined (reading 'ReadWrite')"；强制统一到 v5 规避。
+overrides:
+  '@electron/get': ^5.0.0
+  # 嗅探核心已在 1.49.1 上验证通过，强制锁定该版本，避免自动升级到未验证过的更新版本
+  playwright: 1.49.1
+  playwright-core: 1.49.1

@@ -1,0 +1,50 @@
+appId: com.catcatch.app
+productName: cat_catch
+directories:
+  output: dist
+  buildResources: build
+
+files:
+  - '**/*'
+  - '!src/**'
+  - '!index.html'
+  - '!electron.vite.config.js'
+  - '!scripts/**'
+  - '!downloads/**'
+  - '!.catch-profile/**'
+  - '!.github/**'
+  - '!*.md'
+  - '!cat_catch.config.json'
+  - '!pnpm-lock.yaml'
+  - '!pnpm-workspace.yaml'
+  - '!dev_env.code-workspace'
+
+# ffmpeg-static 的二进制需要以真实可执行文件形式落盘（child_process.spawn 不能在 asar 虚拟文件系统里执行）
+asarUnpack:
+  - '**/ffmpeg-static/**'
+
+# Playwright Chromium 单独作为平台专属资源打入安装包（各平台 CI job 各自下载对应二进制），
+# 运行时由 electron/main/index.js 设置 PLAYWRIGHT_BROWSERS_PATH 指向这里，终端用户无需联网安装
+extraResources:
+  - from: playwright-browsers
+    to: playwright-browsers
+
+mac:
+  category: public.app-category.video
+  target:
+    - dmg
+    - zip
+
+win:
+  target:
+    - nsis
+
+linux:
+  category: Video
+  target:
+    - AppImage
+    - deb
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true

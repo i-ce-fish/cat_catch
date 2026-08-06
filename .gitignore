@@ -148,3 +148,6 @@ downloads/
 *.parts/
 .DS_Store
 .claude/
+
+# Electron 桌面端构建产物（out/、dist/ 已被上面的通用规则覆盖）
+playwright-browsers/

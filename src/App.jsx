@@ -64,13 +64,18 @@ export default function App() {
         <h1>cat_catch</h1>
         <div className="app-header-actions">
           <LoginButton />
-          <button className="btn btn-ghost" onClick={() => setSettingsOpen((v) => !v)}>
-            {settingsOpen ? '收起默认配置' : '默认配置'}
+          <button className="btn btn-ghost" onClick={() => setSettingsOpen(true)}>
+            默认配置
           </button>
         </div>
       </header>
 
-      {settingsOpen && <SettingsPanel settings={settings} onChange={updateSettings} />}
+      <SettingsPanel
+        settings={settings}
+        onChange={updateSettings}
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+      />
 
       <nav className="tabs">
         {TABS.map((t) => (

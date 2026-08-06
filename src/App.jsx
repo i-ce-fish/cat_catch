@@ -38,7 +38,11 @@ export default function App() {
 
   const addTasks = useCallback((newTasks) => {
     if (!newTasks?.length) return;
-    setTasks((prev) => [...newTasks, ...prev]);
+    setTasks((prev) => {
+      const existingIds = new Set(prev.map((t) => t.id));
+      const toPrepend = newTasks.filter((t) => !existingIds.has(t.id));
+      return [...toPrepend, ...prev];
+    });
   }, []);
 
   const retryTask = useCallback(async (id) => {

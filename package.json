@@ -13,9 +13,9 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "fetch:browsers": "node scripts/fetch-playwright-browsers.mjs",
-    "build:mac": "pnpm run build && pnpm run fetch:browsers && electron-builder --mac",
-    "build:win": "pnpm run build && pnpm run fetch:browsers && electron-builder --win",
-    "build:linux": "pnpm run build && pnpm run fetch:browsers && electron-builder --linux"
+    "build:mac": "pnpm run build && pnpm run fetch:browsers && electron-builder --mac --publish never",
+    "build:win": "pnpm run build && pnpm run fetch:browsers && electron-builder --win --publish never",
+    "build:linux": "pnpm run build && pnpm run fetch:browsers && electron-builder --linux --publish never"
   },
   "license": "MIT",
   "author": {

@@ -28,6 +28,9 @@ export default function TaskRow({ task, onRetry }) {
       <td className="task-url" title={task.url}>
         {shorten(task.url)}
       </td>
+      <td className="task-filename" title={task.filename || undefined}>
+        {task.filename ? shorten(task.filename, 40) : '—'}
+      </td>
       <td>
         <span className={`badge badge-${task.status}`}>{statusText}</span>
       </td>

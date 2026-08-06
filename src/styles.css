@@ -236,6 +236,14 @@ body {
   color: #333;
 }
 
+.task-filename {
+  flex: 1.5;
+  color: #555;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .task-progress {
   flex: 2;
   display: flex;

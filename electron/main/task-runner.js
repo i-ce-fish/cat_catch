@@ -8,6 +8,7 @@ import { downloadResources } from '../../lib/download/index.js';
 import { ensureCookie, ensureReferer } from '../../lib/headers.js';
 import { MAX_SNIFF_ATTEMPTS, MEDIA_TYPE, TASK_STATUS } from '../shared/constants.js';
 import { loadBilibiliCookies } from './login-bilibili.js';
+import { cleanTitle } from '../../lib/filename.js';
 
 const { app } = electron;
 
@@ -47,6 +48,7 @@ export class TaskRunner {
       percent: 0,
       error: null,
       outputFiles: [],
+      filename: '',
     };
     this.tasks.set(id, task);
     this._emit(task);
@@ -67,6 +69,7 @@ export class TaskRunner {
     task.error = null;
     task.percent = 0;
     task.phase = '';
+    task.filename = '';
     this._emit(task);
     this.queue.push(id);
     this._pump();
@@ -135,6 +138,7 @@ export class TaskRunner {
           cookies = result.cookies;
           userAgent = result.userAgent;
           pageTitle = result.pageTitle;
+          if (pageTitle) task.filename = cleanTitle(pageTitle);
 
           if (result.dashInfo) {
             const pair = dashPair(result.dashInfo, pageTitle);
@@ -196,6 +200,7 @@ export class TaskRunner {
       task.phase = '完成';
       task.percent = 100;
       task.outputFiles = results;
+      task.filename = results.map((f) => path.basename(f)).join(', ');
       this._emit(task);
     } catch (err) {
       task.status = TASK_STATUS.FAILED;

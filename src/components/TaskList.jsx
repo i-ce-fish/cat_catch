@@ -9,6 +9,7 @@ export default function TaskList({ tasks, onRetry }) {
       <thead>
         <tr>
           <th>URL</th>
+          <th>文件名</th>
           <th>状态</th>
           <th>进度</th>
           <th>操作</th>

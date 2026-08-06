@@ -27,6 +27,43 @@ function toPlaywrightCookie(c) {
   };
 }
 
+const CLOSE_BUTTON_CSS = `
+  #cat-catch-login-close {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 18px;
+    line-height: 28px;
+    text-align: center;
+    padding: 0;
+    cursor: pointer;
+    z-index: 2147483647;
+  }
+  #cat-catch-login-close:hover {
+    background: rgba(0, 0, 0, 0.75);
+  }
+`;
+
+const CLOSE_BUTTON_SCRIPT = `
+  (function () {
+    if (document.getElementById('cat-catch-login-close')) return;
+    var btn = document.createElement('button');
+    btn.id = 'cat-catch-login-close';
+    btn.type = 'button';
+    btn.title = '关闭';
+    btn.setAttribute('aria-label', '关闭');
+    btn.textContent = '\\u00d7';
+    btn.addEventListener('click', function () { window.close(); });
+    document.body.appendChild(btn);
+  })();
+`;
+
 export function startBilibiliLogin(parent, onStatus = () => {}) {
   return new Promise((resolve) => {
     const ses = session.fromPartition(PARTITION);
@@ -34,13 +71,13 @@ export function startBilibiliLogin(parent, onStatus = () => {}) {
       width: 480,
       height: 640,
       parent: parent ?? undefined,
-      modal: !!parent,
       title: '扫码登录 B 站',
       autoHideMenuBar: true,
       webPreferences: { session: ses, contextIsolation: true, nodeIntegration: false },
     });
 
     let settled = false;
+    let hasFocused = false;
     const finish = async (type, message) => {
       if (settled) return;
       settled = true;
@@ -49,6 +86,29 @@ export function startBilibiliLogin(parent, onStatus = () => {}) {
       if (!win.isDestroyed()) win.close();
       resolve();
     };
+
+    // 注入自定义关闭按钮，因为登录页面来自 B 站远程站点，原生窗口作为非模态子窗口不强制带自带的关闭控件
+    win.webContents.on('dom-ready', () => {
+      if (win.isDestroyed()) return;
+      win.webContents.insertCSS(CLOSE_BUTTON_CSS).catch(() => {});
+      win.webContents.executeJavaScript(CLOSE_BUTTON_SCRIPT).catch(() => {});
+    });
+
+    // 支持 Esc 键关闭
+    win.webContents.on('before-input-event', (event, input) => {
+      if (input.type === 'keyDown' && input.key === 'Escape') {
+        event.preventDefault();
+        if (!win.isDestroyed()) win.close();
+      }
+    });
+
+    // 支持点击窗口以外区域（如主窗口）时关闭
+    win.on('focus', () => {
+      hasFocused = true;
+    });
+    win.on('blur', () => {
+      if (hasFocused && !settled && !win.isDestroyed()) win.close();
+    });
 
     async function checkLoggedIn() {
       try {

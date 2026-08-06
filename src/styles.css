@@ -156,6 +156,7 @@ body {
 }
 
 .field input[type='text'],
+.field input[type='number'],
 .field select,
 .field textarea {
   padding: 8px 10px;
@@ -167,6 +168,10 @@ body {
 
 .field input[type='text'] {
   flex: 1;
+}
+
+.field input[type='number'] {
+  width: 80px;
 }
 
 .field textarea {

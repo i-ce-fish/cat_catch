@@ -1,4 +1,4 @@
-import { MAX_SNIFF_ATTEMPTS, TASK_STATUS } from '../../electron/shared/constants.js';
+import { TASK_STATUS } from '../../electron/shared/constants.js';
 
 const STATUS_LABEL = {
   [TASK_STATUS.QUEUED]: '排队中',
@@ -15,10 +15,8 @@ function shorten(url, n = 56) {
 
 export default function TaskRow({ task, onRetry }) {
   const label = STATUS_LABEL[task.status] ?? task.status;
-  const statusText =
-    task.status === TASK_STATUS.RETRYING || (task.status === TASK_STATUS.SNIFFING && task.attempt > 1)
-      ? `${label} ${task.attempt}/${MAX_SNIFF_ATTEMPTS}`
-      : label;
+  // 重试中可能是嗅探重试或下载重试，两者上限不同，直接展示 task.phase（已含「阶段 N/M」）更准确
+  const statusText = task.status === TASK_STATUS.RETRYING ? task.phase : label;
 
   const canRetry = task.status === TASK_STATUS.FAILED;
   const canOpen = task.status === TASK_STATUS.SUCCESS && task.outputFiles?.length > 0;

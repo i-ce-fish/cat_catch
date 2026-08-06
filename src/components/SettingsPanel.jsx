@@ -72,6 +72,17 @@ export default function SettingsPanel({ settings, onChange }) {
           </select>
         </div>
       )}
+
+      <div className="field">
+        <label>重试次数</label>
+        <input
+          type="number"
+          min={1}
+          max={99}
+          value={settings.retryCount}
+          onChange={(e) => onChange({ retryCount: parseInt(e.target.value, 10) || 10 })}
+        />
+      </div>
     </div>
   );
 }

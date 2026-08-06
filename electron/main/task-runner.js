@@ -20,7 +20,7 @@ function profileDir() {
 }
 
 /**
- * 内存任务队列：嗅探（0 资源重试 ≤3 次）→ 选取 → 下载，全程通过 onUpdate 推送状态快照。
+ * 内存任务队列：嗅探（0 资源重试 ≤3 次）→ 选取 → 下载（失败重试 ≤config.retryCount 次，默认 10），全程通过 onUpdate 推送状态快照。
  */
 export class TaskRunner {
   constructor({ onUpdate = () => {}, concurrency = 2 } = {}) {
@@ -171,27 +171,50 @@ export class TaskRunner {
         return;
       }
 
-      task.status = TASK_STATUS.DOWNLOADING;
-      task.phase = '下载中';
-      task.percent = 0;
-      this._emit(task);
-
       const format = config.transcode ? 'mp4' : 'ts';
       const singleM4sFormat = config.transcode ? config.format : 'm4s';
+      const maxDownloadAttempts = config.retryCount ?? 10;
 
-      const { results, errors } = await downloadResources(selected, {
-        outDir: config.outDir,
-        format,
-        singleM4sFormat,
-        concurrency: config.concurrency ?? 6,
-        userAgent,
-        log,
-        onProgress: (info) => this._onProgress(task, info),
-      });
+      let results = [];
+      let errors = [];
+      let downloadErr = null;
 
-      if (errors?.length && !results.length) {
+      for (let attempt = 1; attempt <= maxDownloadAttempts; attempt++) {
+        if (attempt === 1) {
+          task.status = TASK_STATUS.DOWNLOADING;
+          task.phase = '下载中';
+        } else {
+          task.status = TASK_STATUS.RETRYING;
+          task.phase = `下载重试 ${attempt}/${maxDownloadAttempts}`;
+          await new Promise((r) => setTimeout(r, 800 * (attempt - 1)));
+        }
+        task.percent = 0;
+        this._emit(task);
+
+        try {
+          ({ results, errors } = await downloadResources(selected, {
+            outDir: config.outDir,
+            format,
+            singleM4sFormat,
+            concurrency: config.concurrency ?? 6,
+            userAgent,
+            log,
+            onProgress: (info) => this._onProgress(task, info),
+          }));
+          downloadErr = null;
+        } catch (err) {
+          results = [];
+          errors = [];
+          downloadErr = err;
+        }
+
+        if (results.length > 0) break;
+      }
+
+      if (!results.length) {
         task.status = TASK_STATUS.FAILED;
-        task.error = errors.map((e) => e.err.message).join('; ');
+        const reason = downloadErr ? downloadErr.message : errors.map((e) => e.err.message).join('; ');
+        task.error = `下载失败（已尝试 ${maxDownloadAttempts} 次）: ${reason}`;
         this._emit(task);
         return;
       }

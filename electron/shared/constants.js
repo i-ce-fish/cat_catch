@@ -45,4 +45,5 @@ export const DEFAULT_SETTINGS = {
   transcode: true,
   format: 'mp4',
   concurrency: 6,
+  retryCount: 10,
 };

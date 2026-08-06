@@ -62,11 +62,6 @@ body {
   color: #1a8a3d;
 }
 
-.login-hint {
-  font-size: 12px;
-  color: #888;
-}
-
 .tabs {
   display: flex;
   gap: 4px;
